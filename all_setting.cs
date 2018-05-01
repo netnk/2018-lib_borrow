@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.IO;
+using System.Windows.Forms;
 
 namespace lib_borrow
 {
     class all_setting
     {
-        public string ini_url()
+        public string ini_url()  // URL
         {
             using (FileStream fs = new FileStream("host.ini", FileMode.Open))
             {
@@ -19,9 +20,9 @@ namespace lib_borrow
                     return result;
                 }
             }
-        }
+        }  
 
-        public string write_url(string str)
+        public string write_url(string str)  //寫入INI檔用
         {
             using (FileStream fs = new FileStream("host.ini", FileMode.Create))
             {
@@ -31,7 +32,7 @@ namespace lib_borrow
                     return string.Empty;
                 }
             }
-        }
+        }  
 
         public string getservice(string url)  //
         {
@@ -43,6 +44,25 @@ namespace lib_borrow
             }
         }  
 
+        public void clean_control(params Control[] ctols)  //切換畫面時清除控制項
+        {
+
+            //Reference
+            //https://dotblogs.com.tw/kyleshen/2013/10/10/123562
+
+            foreach (Control ctol in ctols)
+            {
+                if (ctol.Name == "control_name" || ctol.Name == "control_name" || ctol.Name == "control_name" || ctol.Name == "control_name" || ctol.Name == "control_name" || ctol.Name == "control_name")
+                {
+                    ctol.Text = "0";
+                }
+                else
+                {
+                    ctol.Text = string.Empty;
+                }
+               
+            }       
+        }
 
     }
 }
