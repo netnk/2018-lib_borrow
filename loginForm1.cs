@@ -31,7 +31,7 @@ namespace lib_borrow
 
         private void pictureBox2_Click(object sender, EventArgs e)
         {
-            string field = libhp.ini_opacurl();
+            string field = libhp.ini_url();
             string id = textBox1.Text.Trim();
             string pwd = textBox2.Text.Trim();
             string url = string.Format("http://{0}/getservice.ashx?mode=1&userid={1}&pwd={2}", field, id, pwd);
