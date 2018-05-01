@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Net;
 using Newtonsoft.Json;
-using System.IO;
 using lib_borrow;
 
 
@@ -29,6 +25,8 @@ namespace lib_borrow
             this.lbl_loginid.Text = string1;
         }
 
+        lib_borrow.all_setting libhp = new all_setting();
+
         public Form1()
         {
             InitializeComponent();
@@ -46,20 +44,20 @@ namespace lib_borrow
         
         private void button1_Click(object sender, EventArgs e)  //
         {
-            string ip = ini_url();
+            string ip = libhp.ini_url();
             string readerid = textBox1.Text;
             string url = string.Format("http://{0}/getservice.ashx?mode=2&readerid={1}", ip, readerid);
-            string get = getservice(url);            
+            string get = libhp.getservice(url);            
 
             Login m = JsonConvert.DeserializeObject<Login>(get);
-            // MessageBox.Show(m.field);
+            // MessageBox.Show(m.reader02);
 
-            textBox1.Text = m.field;
+            textBox1.Text = m.field01;
+            lbl_reader02.Text = m.field02;
+            lbl_reader72.Text = m.rfield72;
             lbl_field.Text = m.field;
-            lbl_field.Text = m.field;
-            lbl_field.Text = m.field;
-            lbl_field.Text = m.field.ToString();
-            lbl_field.Text = m.field.ToString();
+            lbl_yyrgnum.Text = m.field.ToString();
+            lbl_fk.Text = m.fk.ToString();
             lbl_tsk.Text = m.tsk.ToString();
             lbl_tsy.Text = m.tsy.ToString();
             lbl_fsk.Text = m.fsk.ToString();
@@ -124,26 +122,26 @@ namespace lib_borrow
 
         private void button2_Click(object sender, EventArgs e)  //
         {
-            string ip = ini_url();
+            string ip = libhp.ini_url();
             string userid = textBox1.Text.Trim();
             string barcode = textBox2.Text.Trim();
-            string field = lbl_field.Text;
-            string field = lbl_field.Text;
-            string url = string.Format("http://{0}/getservice.ashx?mode=3&field={1}&field={2}&field={3}&field={4}",ip, userid, field,field,field);
+            string field = lbl_loginid.Text;
+            string field = lbl_reader72.Text;
+            string url = string.Format("http://{0}/getservice.ashx?mode=3&readerid={1}&field={2}&field={3}&hifieldst13={4}",opacurl, userid, barcode,sent05,hist13);
            // MessageBox.Show(url);
-            string get = getservice(url);
+            string get = libhp.getservice(url);
 
             Borrow m = JsonConvert.DeserializeObject<Borrow>(get);
             //  MessageBox.Show(m.cata12);
 
-            switch(m.result.ToString())
+            switch(m.field.ToString())
             {
                 case "0":
                     {
                         dataGridView1.AllowUserToAddRows = false;  //
 
                         DataGridViewRowCollection rows = dataGridView1.Rows;
-                        rows.Insert(0, new Object[] { m.field, m.field, "", m.field, m.field, field });  //
+                        rows.Insert(0, new Object[] { m.acce01, m.cata12, "", m.field, m.field, field });  //
                         dataGridView1.Rows[0].Cells[4].Style.ForeColor = Color.Red;  //
                        
                         if (dataGridView1.Rows.Count > 0)
@@ -156,47 +154,25 @@ namespace lib_borrow
                             }
                         }
 
-                        int field_total = Convert.ToInt32(lbl_field.Text);  //
-                        tsy_field += 1;
-                        lbl_field.Text = tsy_field.ToString();
+                        int tsy_total = Convert.ToInt32(lbl_field.Text);  //
+                        tsy_total += 1;
+                        lbl_tsy.Text = tsy_total.ToString();
 
                         textBox2.Text = string.Empty;
                         break;
                     }
                 default:
                     {
-                        MessageBox.Show(m.field.ToString(),"Message", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        MessageBox.Show(m.msg.ToString(),"Message", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         textBox2.Text = string.Empty;
                         break;
                     }                
             }
 
-            //MessageBox.Show(m.field);
-        }
-      
-        private string ini_url()
-        {
-            using (FileStream fs = new FileStream("host.ini", FileMode.Open))
-            {
-                using (StreamReader rw = new StreamReader(fs))
-                {
-                    string result = rw.ReadLine();
-                    return result;
-                }
-            }
-        }  //
+            //MessageBox.Show(m.result);
+        }      
 
-        private string getservice(string url)
-        {
-            using (WebClient wc = new WebClient())
-            {
-                wc.Encoding = System.Text.Encoding.UTF8;
-                string result = wc.DownloadString(url);
-                return result;
-            }
-        }  // 
-
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)  //
         {
             Application.Exit();
         }
