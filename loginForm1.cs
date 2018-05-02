@@ -31,21 +31,21 @@ namespace lib_borrow
 
         private void pictureBox2_Click(object sender, EventArgs e)
         {
-            string field = libhp.ini_url();
+            string opacurl = libhp.ini_opacurl();
             string id = textBox1.Text.Trim();
             string pwd = textBox2.Text.Trim();
-            string url = string.Format("http://{0}/getservice.ashx?mode=1&userid={1}&pwd={2}", field, id, pwd);
+            string url = string.Format("http://{0}/getservice.ashx?mode=1&userid={1}&pwd={2}", opacurl, id, pwd);
             string get = libhp.getservice(url);
 
             Checkadmi m = JsonConvert.DeserializeObject<Checkadmi>(get);
 
-            switch (m.field.ToString())
+            switch (m.result.ToString())
             {
                 case "0":
                     {
                         //  MessageBox.Show("Success!!");
                         Form1 frm1 = new Form1();
-                        frm1.String1 = m.field;
+                        frm1.String1 = m.userid;
                         frm1.SetValue();
                         frm1.ShowDialog();
                         this.Enabled = false;
@@ -55,9 +55,7 @@ namespace lib_borrow
                 default:
                     {
                         MessageBox.Show(m.msg.ToString(), "Message", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-
-                        textBox1.Text = string.Empty;
-                        textBox2.Text = string.Empty;
+                        libhp.clean_control(textBox1, textBox2);
                         textBox1.Focus();
                         break;
                     }
