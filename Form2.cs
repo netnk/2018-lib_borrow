@@ -15,7 +15,7 @@ namespace lib_borrow
         public Form2()
         {
             InitializeComponent();
-            libhp.ini_url();
+            textBox1.Text = libhp.ini_url();
         }
 
         private void button1_Click(object sender, EventArgs e)
