@@ -44,19 +44,19 @@ namespace lib_borrow
         
         private void button1_Click(object sender, EventArgs e)  //
         {
-            string ip = libhp.ini_url();
+            string opacurl = libhp.ini_opacurl();
             string readerid = textBox1.Text;
-            string url = string.Format("http://{0}/getservice.ashx?mode=2&readerid={1}", ip, readerid);
+            string url = string.Format("http://{0}/getservice.ashx?mode=2&readerid={1}", opacurl, readerid);
             string get = libhp.getservice(url);            
 
             Login m = JsonConvert.DeserializeObject<Login>(get);
             // MessageBox.Show(m.reader02);
 
-            textBox1.Text = m.field01;
-            lbl_reader02.Text = m.field02;
-            lbl_reader72.Text = m.rfield72;
-            lbl_field.Text = m.field;
-            lbl_yyrgnum.Text = m.field.ToString();
+            textBox1.Text = m.reader01;
+            lbl_reader02.Text = m.reader02;
+            lbl_reader72.Text = m.reader72;
+            lbl_yxrq.Text = m.yxrq;
+            lbl_yyrgnum.Text = m.yyrgnum.ToString();
             lbl_fk.Text = m.fk.ToString();
             lbl_tsk.Text = m.tsk.ToString();
             lbl_tsy.Text = m.tsy.ToString();
@@ -68,17 +68,25 @@ namespace lib_borrow
             switch (m.result.ToString())
             {
                 case "0":
-                    {
+                    {                        
+                        
+                        string url2 = string.Format("http://{0}/getservice.ashx?mode=5&readerid={1}", opacurl, readerid);
+                        string get2 = libhp.getservice(url2);
+
+                        DataTable dt = JsonConvert.DeserializeObject<DataTable>(get2);
+                        dataGridView3.DataSource = dt;
+                       
                         textBox2.Enabled = true;
                         textBox2.Focus();
 
                         dataGridView1.Rows.Clear();
+
                         break;
                     }
                 default:
                     {
                         MessageBox.Show(m.msg.ToString(), "Message", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                        textBox2.Text = string.Empty;
+                        libhp.clean_control(textBox2);
                         break;
                     }
             }
@@ -122,27 +130,32 @@ namespace lib_borrow
 
         private void button2_Click(object sender, EventArgs e)  //
         {
-            string ip = libhp.ini_url();
+            string opacurl = libhp.ini_opacurl();
             string userid = textBox1.Text.Trim();
-            string barcode = textBox2.Text.Trim();
+            string field = textBox2.Text.Trim();
             string field = lbl_loginid.Text;
             string field = lbl_reader72.Text;
-            string url = string.Format("http://{0}/getservice.ashx?mode=3&readerid={1}&field={2}&field={3}&hifieldst13={4}",opacurl, userid, barcode,sent05,hist13);
+            string url = string.Format("http://{0}/wgetservice.ashx?mode=3&readerid={1}&field={2}&field={3}&field={4}",opacurl, userid, field,field,field);
            // MessageBox.Show(url);
             string get = libhp.getservice(url);
 
             Borrow m = JsonConvert.DeserializeObject<Borrow>(get);
             //  MessageBox.Show(m.cata12);
 
-            switch(m.field.ToString())
+            switch(m.result.ToString())
             {
                 case "0":
-                    {
-                        dataGridView1.AllowUserToAddRows = false;  //
+                    {                       
 
-                        DataGridViewRowCollection rows = dataGridView1.Rows;
-                        rows.Insert(0, new Object[] { m.acce01, m.cata12, "", m.field, m.field, field });  //
-                        dataGridView1.Rows[0].Cells[4].Style.ForeColor = Color.Red;  //
+                        dataGridView1.ColumnCount = 6;
+                        dataGridView1.Columns[0].Name = "field";
+                        dataGridView1.Columns[1].Name = "field";
+                        dataGridView1.Columns[2].Name = "field";
+                        dataGridView1.Columns[3].Name = "field";
+                        dataGridView1.Columns[4].Name = "field";
+                        dataGridView1.Columns[5].Name = "field";
+                       
+                        dataGridView1.Rows.Insert(0, m.field, m.field, "", m.field, m.field, field);
                        
                         if (dataGridView1.Rows.Count > 0)
                         {
@@ -154,17 +167,19 @@ namespace lib_borrow
                             }
                         }
 
-                        int tsy_total = Convert.ToInt32(lbl_field.Text);  //
+                        
+
+                        int tsy_total = Convert.ToInt32(lbl_tsy.Text);  //
                         tsy_total += 1;
                         lbl_tsy.Text = tsy_total.ToString();
 
-                        textBox2.Text = string.Empty;
+                        libhp.clean_control(textBox2);
                         break;
                     }
                 default:
                     {
                         MessageBox.Show(m.msg.ToString(),"Message", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                        textBox2.Text = string.Empty;
+                        libhp.clean_control(textBox2);
                         break;
                     }                
             }
@@ -188,65 +203,119 @@ namespace lib_borrow
 
         private void pic_lt1_Click(object sender, EventArgs e)  //
         {
-         
-            pic_hs0.Visible = true;
-            pic_lt1.Visible = true;
+            groupBox1.Visible = true;
+            groupBox2.Visible = false;
+
+            textBox1.Focus();
+            textBox2.Enabled = false;
+
+            libhp.clean_control(textBox1, textBox2, lbl_reader02, lbl_reader72, lbl_yxrq, lbl_yyrgnum, lbl_fk, lbl_tsk, lbl_tsy, lbl_fsk, lbl_fsy, lbl_qkk, lbl_qky);
+            libhp.display_control(pic_hs0, pic_lt1);           
             pic_hs1.Visible = false;
 
-            pictureBox6.Visible = false;
-            dataGridView2.Visible = false;
-            label8.Visible = false;
-            textBox3.Visible = false;
+            DataTable dt = new DataTable();
+            dt.Clear();           
+            dataGridView3.DataSource = dt;
+            dataGridView1.DataSource = null;
+
             MessageBox.Show("1");
+           
         }
 
         private void pic_lt0_Click(object sender, EventArgs e)  //
         {
+            groupBox1.Visible = true;
+            groupBox2.Visible = false;
 
-           
+            textBox1.Focus();
+            textBox2.Enabled = false;
 
-            pic_hs0.Visible = true;
-            pic_lt1.Visible = true;
+            libhp.clean_control(textBox1, textBox2, lbl_reader02, lbl_reader72, lbl_yxrq, lbl_yyrgnum, lbl_fk, lbl_tsk, lbl_tsy, lbl_fsk, lbl_fsy, lbl_qkk, lbl_qky);
+            libhp.display_control(pic_hs0, pic_lt1);           
             pic_hs1.Visible = false;
 
-            pictureBox6.Visible = false;
-            dataGridView2.Visible = false;
-            label8.Visible = false;
-            textBox3.Visible = false;
+            DataTable dt = new DataTable();
+            dt.Clear();            
+            dataGridView3.DataSource = dt;
+            dataGridView1.DataSource = null;
+
+         
+
             MessageBox.Show("1");
         }
 
         private void pic_hs1_Click(object sender, EventArgs e)  //
         {
-            
+            groupBox1.Visible = false;
+            groupBox2.Visible = true;
 
-            pic_hs1.Visible = true;
-            pic_lt0.Visible = true;
+            libhp.clean_control(textBox1, textBox2, lbl_reader02, lbl_reader72, lbl_yxrq, lbl_yyrgnum, lbl_fk, lbl_tsk, lbl_tsy, lbl_fsk, lbl_fsy, lbl_qkk, lbl_qky);
+            libhp.display_control(pic_hs1, pic_lt0);          
             pic_lt1.Visible = false;
+          
+            DataTable dt = new DataTable();
+            dt.Clear();           
+            dataGridView3.DataSource = dt;
+            dataGridView1.DataSource = null;
 
-            pictureBox6.Visible = true;
-            dataGridView2.Visible = true;
-            label8.Visible = true;
-            textBox3.Visible = true;
-            textBox3.Focus();
             MessageBox.Show("2");
         }
 
         private void pic_hs0_Click(object sender, EventArgs e)  //
         {
-            
+            groupBox1.Visible = false;
+            groupBox2.Visible = true;
 
-            pic_hs1.Visible = true;
-            pic_lt0.Visible = true;
+
+
+
+            libhp.clean_control(textBox1, textBox2, lbl_reader02, lbl_reader72, lbl_yxrq, lbl_yyrgnum, lbl_fk, lbl_tsk, lbl_tsy, lbl_fsk, lbl_fsy, lbl_qkk, lbl_qky);
+            libhp.display_control(pic_hs1, pic_lt0);         
             pic_lt1.Visible = false;
 
-            pictureBox6.Visible = true;
-            dataGridView2.Visible = true;
-            label8.Visible = true;
-            textBox3.Visible = true;
-            textBox3.Focus();
+            DataTable dt = new DataTable();
+            dt.Clear();            
+            dataGridView3.DataSource = dt;
+            dataGridView1.DataSource = null;
+
+           
+            
 
             MessageBox.Show("2");
         }
+
+        private void dataGridView3_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)  //
+        {
+            dataGridView3.Columns[0].HeaderText = "field";
+            dataGridView3.Columns[0].Width = 100;
+            dataGridView3.Columns[1].HeaderText = "field";
+            dataGridView3.Columns[1].Width = 250;
+            dataGridView3.Columns[2].HeaderText = "field";
+            dataGridView3.Columns[2].Width = 70;
+            dataGridView3.Columns[3].HeaderText = "field";
+            dataGridView3.Columns[4].HeaderText = "field";
+
+            /*
+            for (int i=0; i<dataGridView3.Rows.Count;i++)
+            {
+                dataGridView3.Rows[i].Cells[3].Style.ForeColor = Color.Red;
+            }
+            */
+            
+        }
+
+        private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)  //
+        {
+            dataGridView1.ColumnCount = 6;
+
+            dataGridView1.Columns[0].Width = 100;
+
+            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+            {
+                dataGridView1.Rows[i].Cells[4].Style.ForeColor = Color.Red;
+            }
+        }
+
+       
     }
 }
