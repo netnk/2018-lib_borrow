@@ -5,6 +5,8 @@ using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using lib_borrow;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace lib_borrow
 {
@@ -15,13 +17,40 @@ namespace lib_borrow
         public Form2()
         {
             InitializeComponent();
-            textBox1.Text = libhp.ini_url();
+            textBox1.Text = libhp.ini_opacurl();
+
+            switch (libhp.ini_mode())
+            {
+                case "0":
+                    {
+                        radio_webservice.Checked = true;
+                        textBox1.Text = libhp.ini_opacurl();
+                        break;
+                    }
+                case "1":
+                    {
+                        radio_mssql.Checked = true;
+                        textBox1.Text = libhp.ini_opacurl();
+                        break;
+                    }
+            }
+
+
+
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            libhp.write_url(textBox1.Text.Trim());
-            this.Close();            
+            if (radio_webservice.Checked)
+            {
+                libhp.write_url_json("0", textBox1.Text.Trim());
+            }
+            else
+            {
+                libhp.write_url_json("1", textBox1.Text.Trim());
+            }
+
+            this.Close();
         }
     }
 }
